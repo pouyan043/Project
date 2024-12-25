@@ -11,7 +11,7 @@ import (
 func main() {
 	//  connecting to  Redis
 	client := asynq.NewClient(asynq.RedisClientOpt{Addr: "localhost:6379"})
-	defer client.Close() //بستن redis
+	defer client.Close() //closing redis
 
 	//   payload explain 
 	payload := map[string]interface{}{
