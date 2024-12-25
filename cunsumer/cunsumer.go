@@ -9,44 +9,44 @@ import (
 )
 
 func main() {
-	// اتصال به Redis
+	// connecting to  Redis
 	server := asynq.NewServer(
 		asynq.RedisClientOpt{Addr: "localhost:6379"},
 		asynq.Config{
-			Concurrency: 10, // تعداد شغلی ک همزمان میتونن پردازش بشن
+			Concurrency: 10, // the jobs that can proccesing at the same time 
 		},
 	)
 
-	//  تعریف handler
+	//  handler explains 
 	mux := asynq.NewServeMux()
-	mux.HandleFunc("email:send", handleEmailTask) // تعریف handler برای jobهای email:send
+	mux.HandleFunc("email:send", handleEmailTask) // handler explain for jobs  email:send
 
-	//  راه‌اندازی سرور
+	//  starting server 
 	if err := server.Run(mux); err != nil {
-		log.Fatalf("خطا در اجرای سرور: %v", err)
+		log.Fatalf("invalid to start server: %v", err)
 	}
 }
 
 // funcبرای job handler
 func handleEmailTask(ctx context.Context, t *asynq.Task) error {
-	// برگردوندن اطلاعات
+	// return informations 
 	var payload map[string]interface{}
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return err //
 	}
 
-	//برگردوندن مقدار از payload
-	userID, ok := payload["user_id"].(float64) // تبدیل اعداد از float 64 be int توسط json unmarshal
+	//return value from payload 
+	userID, ok := payload["user_id"].(float64) //convert float 64 to  int from  json unmarshal
 	if !ok {
-		return &json.UnmarshalTypeError{} // خطای برگردوندن user id
+		return &json.UnmarshalTypeError{} // return eror  user id
 	}
 
 	taskName, ok := payload["task_name"].(string)
 	if !ok {
-		return &json.UnmarshalTypeError{} // خطای برگردوندن task name
+		return &json.UnmarshalTypeError{} // return eror  task name
 	}
 
-	// پردازش job
+	//  job processing 
 	log.Printf("proccesing job : task_name=%s, user_id=%d", taskName, int(userID))
 	log.Println("the job succes")
 	return nil
